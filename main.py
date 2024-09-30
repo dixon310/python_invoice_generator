@@ -26,6 +26,16 @@ def add_item():
     invoice_list.append(invoice_item)
 
 
+def invoiceOrQuote():
+    """Determines the document type (invoice or quote) based on radio button selection.
+
+    This function now sets a global variable `doc_type` to track the selected type.
+    """
+    global doc_type
+    if invoice_radiobutton.get() == 1:
+        doc_type = "invoice"
+    else:
+        doc_type = "quote"
 
 def new_invoice():
     first_name_entry.delete(0, tkinter.END)
@@ -63,21 +73,28 @@ window = tkinter.Tk()
 window.title("Invoice Generator Form")
 
 frame = tkinter.Frame(window)
-frame.pack(padx=20, pady=20)
+frame.pack()
 
-first_name_label = tkinter.Label(frame, text="First Name")
-last_name_label = tkinter.Label(frame, text="Last Name")
-first_name_entry = tkinter.Entry(frame)
-last_name_entry = tkinter.Entry(frame)
-first_name_label.grid(row=0,column=0)
-last_name_label.grid(row=0,column=1)
-first_name_entry.grid(row=1, column=0)
-last_name_entry.grid(row=1, column=1)
+customer_info_frame = tkinter.LabelFrame(frame, text="Customer Information")
+customer_info_frame.grid(row=0, column=0)
 
-phone_label = tkinter.Label(frame, text="Phone")
-phone_entry = tkinter.Entry(frame)
-phone_label.grid(row=0, column=2)
-phone_entry.grid(row=1, column=2)
+invoiceOrQuote_frame = tkinter.LabelFrame(frame, text="Invoice / Quote")
+invoiceOrQuote_frame.grid(row=0, column=1)
+
+invoice_radiobutton = tkinter.Radiobutton(invoiceOrQuote_frame, text='INVOICE',value=1).grid(row=0,column=0)
+quote_radiobutton = tkinter.Radiobutton(invoiceOrQuote_frame, text='QUOTE', value=0).grid(row=1,column=0)
+
+company_name_label = tkinter.Label(customer_info_frame, text="Company Name: ").grid(row=0, column=0)
+first_name_label = tkinter.Label(customer_info_frame, text="First Name: ").grid(row=1, column=0)
+last_name_label = tkinter.Label(customer_info_frame, text="Last Name: ").grid(row=2,column=0)
+company_name_entry = tkinter.Entry(customer_info_frame).grid(row=0, column=1)
+first_name_entry = tkinter.Entry(customer_info_frame).grid(row=1, column=1)
+last_name_entry = tkinter.Entry(customer_info_frame).grid(row=2, column=1)
+
+phone_label = tkinter.Label(customer_info_frame, text="Phone")
+phone_entry = tkinter.Entry(customer_info_frame)
+phone_label.grid(row=3, column=0)
+phone_entry.grid(row=3, column=1)
 
 qty_label = tkinter.Label(frame, text="Qty")
 qty_label.grid(row=2, column=0)
@@ -96,6 +113,9 @@ price_spinbox.grid(row=3, column=2)
 
 add_item_button = tkinter.Button(frame, text="Add item", command=add_item)
 add_item_button.grid(row=4, column=2, pady=5)
+
+
+
 
 
 columns = ('qty', 'desc', 'price', 'total')
