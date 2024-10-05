@@ -1,5 +1,5 @@
-import tkinter
-from tkinter import ttk
+import customtkinter as ctk
+from tkinter import ttk  # Import ttk for Treeview
 from docxtpl import DocxTemplate
 import datetime
 from tkinter import messagebox
@@ -7,23 +7,24 @@ from tkinter import messagebox
 
 # Clear the current item inputs
 def clear_item():
-    quantity_spinbox.delete(0, tkinter.END)
+    quantity_spinbox.delete(0, ctk.END)
     quantity_spinbox.insert(0, "1")
-    desc_entry.delete(0, tkinter.END)
-    price_spinbox.delete(0, tkinter.END)
+    desc_entry.delete(0, ctk.END)
+    price_spinbox.delete(0, ctk.END)
     price_spinbox.insert(0, "0.0")
 
 
 # List to store invoice items
 invoice_list = []
 
+
 # Add item to the invoice
 def add_item():
     try:
         qty = int(quantity_spinbox.get())
-        desc = desc_entry.get().capitalize()
+        desc = desc_entry.get().capitalize()  # Capitalize the first letter of the description
         price = float(price_spinbox.get())
-        line_total = round(qty * price, 2)
+        line_total = round(qty * price, 2)  # Round the line total to 2 decimal places
         invoice_item = [qty, desc, price, line_total]
         tree.insert('', 0, values=invoice_item)
         clear_item()
@@ -34,9 +35,9 @@ def add_item():
 
 # Clear the form for a new invoice
 def new_invoice():
-    first_name_entry.delete(0, tkinter.END)
-    last_name_entry.delete(0, tkinter.END)
-    phone_entry.delete(0, tkinter.END)
+    first_name_entry.delete(0, ctk.END)
+    last_name_entry.delete(0, ctk.END)
+    phone_entry.delete(0, ctk.END)
     clear_item()
     tree.delete(*tree.get_children())
     invoice_list.clear()
@@ -52,18 +53,18 @@ def generate_invoice():
         doc = DocxTemplate("invoice_template.docx")
         name = first_name_entry.get() + " " + last_name_entry.get()
         phone = phone_entry.get()
-        subtotal = sum(item[3] for item in invoice_list)
+        subtotal = round(sum(item[3] for item in invoice_list), 2)  # Round subtotal to 2 decimal places
         salestax = 0.1
-        total = subtotal * (1 + salestax)
+        total = round(subtotal * (1 + salestax), 2)  # Round the total to 2 decimal places
         doc_type_selection = "Invoice" if doc_type_option.get() == 0 else "Quote"
 
         doc.render({
             "name": name,
             "phone": phone,
             "invoice_list": invoice_list,
-            "subtotal": subtotal,
+            "subtotal": f"{subtotal:.2f}",  # Format subtotal to 2 decimal places
             "salestax": str(salestax * 100) + "%",
-            "total": total,
+            "total": f"{total:.2f}",  # Format total to 2 decimal places
             "doc_type": doc_type_selection
         })
 
@@ -78,75 +79,78 @@ def generate_invoice():
 
 
 # Main window
-window = tkinter.Tk()
+ctk.set_appearance_mode("dark")  # Options: "System" (default), "Light", "Dark"
+ctk.set_default_color_theme("blue")  # Options: "blue" (default), "green", "dark-blue"
+
+window = ctk.CTk()
 window.title("Invoice Generator Form")
+window.geometry("600x600")
 
-frame = tkinter.Frame(window)
-frame.pack()
+frame = ctk.CTkFrame(window)
+frame.pack(padx=20, pady=20)
 
-doc_type_option = tkinter.IntVar()
+doc_type_option = ctk.IntVar()
 
 # Customer Information Frame
-customer_info_frame = tkinter.LabelFrame(frame, text="Customer Information")
-customer_info_frame.grid(row=0, column=0)
+customer_info_frame = ctk.CTkFrame(frame, corner_radius=10)
+customer_info_frame.grid(row=0, column=0, padx=10, pady=10)
 
-# Invoice/Quote selection frame
-invoiceOrQuote_frame = tkinter.LabelFrame(frame, text="Invoice / Quote")
-invoiceOrQuote_frame.grid(row=0, column=1)
+ctk.CTkLabel(customer_info_frame, text="Customer Information").grid(row=0, column=0, columnspan=2, pady=5)
+ctk.CTkLabel(customer_info_frame, text="First Name:").grid(row=1, column=0)
+ctk.CTkLabel(customer_info_frame, text="Last Name:").grid(row=2, column=0)
+ctk.CTkLabel(customer_info_frame, text="Phone:").grid(row=3, column=0)
 
-# Invoice/Quote radio buttons
-invoice_radiobutton = tkinter.Radiobutton(invoiceOrQuote_frame, text='INVOICE', variable=doc_type_option, value=0)
-invoice_radiobutton.grid(row=0, column=0)
-quote_radiobutton = tkinter.Radiobutton(invoiceOrQuote_frame, text='QUOTE', variable=doc_type_option, value=1)
-quote_radiobutton.grid(row=1, column=0)
+first_name_entry = ctk.CTkEntry(customer_info_frame)
+first_name_entry.grid(row=1, column=1, pady=5)
+last_name_entry = ctk.CTkEntry(customer_info_frame)
+last_name_entry.grid(row=2, column=1, pady=5)
+phone_entry = ctk.CTkEntry(customer_info_frame)
+phone_entry.grid(row=3, column=1, pady=5)
 
-# Customer Information fields
-tkinter.Label(customer_info_frame, text="Company Name:").grid(row=0, column=0)
-tkinter.Label(customer_info_frame, text="First Name:").grid(row=1, column=0)
-tkinter.Label(customer_info_frame, text="Last Name:").grid(row=2, column=0)
-tkinter.Label(customer_info_frame, text="Phone:").grid(row=3, column=0)
+# Invoice/Quote selection
+invoiceOrQuote_frame = ctk.CTkFrame(frame, corner_radius=10)
+invoiceOrQuote_frame.grid(row=0, column=1, padx=10, pady=10)
 
-company_name_entry = tkinter.Entry(customer_info_frame)
-company_name_entry.grid(row=0, column=1)
-first_name_entry = tkinter.Entry(customer_info_frame)
-first_name_entry.grid(row=1, column=1)
-last_name_entry = tkinter.Entry(customer_info_frame)
-last_name_entry.grid(row=2, column=1)
-phone_entry = tkinter.Entry(customer_info_frame)
-phone_entry.grid(row=3, column=1)
+ctk.CTkLabel(invoiceOrQuote_frame, text="Invoice / Quote").grid(row=0, column=0, columnspan=2, pady=5)
+invoice_radiobutton = ctk.CTkRadioButton(invoiceOrQuote_frame, text='Invoice', variable=doc_type_option, value=0)
+invoice_radiobutton.grid(row=1, column=0)
+quote_radiobutton = ctk.CTkRadioButton(invoiceOrQuote_frame, text='Quote', variable=doc_type_option, value=1)
+quote_radiobutton.grid(row=2, column=0)
 
-# Item Details (Qty, Description, Price)
-tkinter.Label(frame, text="Qty").grid(row=2, column=0)
-quantity_spinbox = tkinter.Spinbox(frame, from_=1, to=100)
-quantity_spinbox.grid(row=3, column=0)
+# Item Details
+ctk.CTkLabel(frame, text="Qty").grid(row=1, column=0)
+quantity_spinbox = ctk.CTkEntry(frame)
+quantity_spinbox.insert(0, "1")
+quantity_spinbox.grid(row=2, column=0, pady=5)
 
-tkinter.Label(frame, text="Description").grid(row=2, column=1)
-desc_entry = tkinter.Entry(frame)
-desc_entry.grid(row=3, column=1)
+ctk.CTkLabel(frame, text="Description").grid(row=1, column=1)
+desc_entry = ctk.CTkEntry(frame)
+desc_entry.grid(row=2, column=1, pady=5)
 
-tkinter.Label(frame, text="Unit Price").grid(row=2, column=2)
-price_spinbox = tkinter.Spinbox(frame, from_=0.0, to=999999, increment=0.5)
-price_spinbox.grid(row=3, column=2)
+ctk.CTkLabel(frame, text="Unit Price").grid(row=1, column=2)
+price_spinbox = ctk.CTkEntry(frame)
+price_spinbox.insert(0, "0.0")
+price_spinbox.grid(row=2, column=2, pady=5)
 
 # Add item button
-add_item_button = tkinter.Button(frame, text="Add item", command=add_item)
-add_item_button.grid(row=4, column=2, pady=5)
+add_item_button = ctk.CTkButton(frame, text="Add Item", command=add_item)
+add_item_button.grid(row=3, column=2, pady=5)
 
-# Treeview for invoice items
+# Treeview for invoice items using ttk
 columns = ('qty', 'desc', 'price', 'total')
 tree = ttk.Treeview(frame, columns=columns, show="headings")
 tree.heading('qty', text='Qty')
 tree.heading('desc', text='Description')
 tree.heading('price', text='Unit Price')
-tree.heading('total', text="Total")
-tree.grid(row=5, column=0, columnspan=3, padx=20, pady=10)
+tree.heading('total', text='Total')
+tree.grid(row=4, column=0, columnspan=3, padx=20, pady=10)
 
 # Generate document button
-save_invoice_button = tkinter.Button(frame, text="Generate document", command=generate_invoice)
-save_invoice_button.grid(row=6, column=0, columnspan=3, sticky="news", padx=20, pady=5)
+save_invoice_button = ctk.CTkButton(frame, text="Generate Document", command=generate_invoice)
+save_invoice_button.grid(row=5, column=0, columnspan=3, sticky="news", padx=20, pady=5)
 
 # New Invoice button
-new_invoice_button = tkinter.Button(frame, text="New Invoice", command=new_invoice)
-new_invoice_button.grid(row=7, column=0, columnspan=3, sticky="news", padx=20, pady=5)
+new_invoice_button = ctk.CTkButton(frame, text="New Invoice", command=new_invoice)
+new_invoice_button.grid(row=6, column=0, columnspan=3, sticky="news", padx=20, pady=5)
 
 window.mainloop()
