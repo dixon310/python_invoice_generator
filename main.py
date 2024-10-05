@@ -27,15 +27,7 @@ def add_item():
 
 
 def invoiceOrQuote():
-    """Determines the document type (invoice or quote) based on radio button selection.
-
-    This function now sets a global variable `doc_type` to track the selected type.
-    """
-    global doc_type
-    if invoice_radiobutton.get() == 1:
-        doc_type = "invoice"
-    else:
-        doc_type = "quote"
+    doc_type_selection = str(doc_type_option.get())
 
 def new_invoice():
     first_name_entry.delete(0, tkinter.END)
@@ -53,21 +45,24 @@ def generate_invoice():
     subtotal = sum(item[3] for item in invoice_list) 
     salestax = 0.1
     total = subtotal*(1-salestax)
+    doc_type_selection = "Invoice" if doc_type_option.get() == 0 else "Quote"
     
-    doc.render({"name":name, 
+    doc.render({
+                "name":name, 
                 "phone":phone,
                 "invoice_list": invoice_list,
                 "subtotal":subtotal,
                 "salestax":str(salestax*100)+"%",
-                "total":total})
+                "total":total,
+                "doc_type":doc_type_selection
+                })
     
-    doc_name = "invoice " + name + "_" + datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S") + ".docx"
+    doc_name = doc_type_selection + name + "_" + datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S") + ".docx"
     doc.save(doc_name)
     
-    messagebox.showinfo("Invoice Complete", "Invoice Complete")
+    messagebox.showinfo(doc_type_selection+" Complete", doc_type_selection+" Complete")
     
     new_invoice()
-
 
 window = tkinter.Tk()
 window.title("Invoice Generator Form")
@@ -75,21 +70,28 @@ window.title("Invoice Generator Form")
 frame = tkinter.Frame(window)
 frame.pack()
 
+doc_type_option = tkinter.IntVar()
+
 customer_info_frame = tkinter.LabelFrame(frame, text="Customer Information")
 customer_info_frame.grid(row=0, column=0)
 
 invoiceOrQuote_frame = tkinter.LabelFrame(frame, text="Invoice / Quote")
 invoiceOrQuote_frame.grid(row=0, column=1)
 
-invoice_radiobutton = tkinter.Radiobutton(invoiceOrQuote_frame, text='INVOICE',value=1).grid(row=0,column=0)
-quote_radiobutton = tkinter.Radiobutton(invoiceOrQuote_frame, text='QUOTE', value=0).grid(row=1,column=0)
+invoice_radiobutton = tkinter.Radiobutton(invoiceOrQuote_frame, text='INVOICE',variable=doc_type_option ,value=0, command=invoiceOrQuote)
+invoice_radiobutton.grid(row=0,column=0)
+quote_radiobutton = tkinter.Radiobutton(invoiceOrQuote_frame, text='QUOTE',variable=doc_type_option , value=1, command=invoiceOrQuote)
+quote_radiobutton.grid(row=1,column=0)
 
 company_name_label = tkinter.Label(customer_info_frame, text="Company Name: ").grid(row=0, column=0)
 first_name_label = tkinter.Label(customer_info_frame, text="First Name: ").grid(row=1, column=0)
 last_name_label = tkinter.Label(customer_info_frame, text="Last Name: ").grid(row=2,column=0)
 company_name_entry = tkinter.Entry(customer_info_frame).grid(row=0, column=1)
-first_name_entry = tkinter.Entry(customer_info_frame).grid(row=1, column=1)
-last_name_entry = tkinter.Entry(customer_info_frame).grid(row=2, column=1)
+
+first_name_entry = tkinter.Entry(customer_info_frame)
+first_name_entry.grid(row=1, column=1)
+last_name_entry = tkinter.Entry(customer_info_frame)
+last_name_entry.grid(row=2, column=1)
 
 phone_label = tkinter.Label(customer_info_frame, text="Phone")
 phone_entry = tkinter.Entry(customer_info_frame)
@@ -115,9 +117,6 @@ add_item_button = tkinter.Button(frame, text="Add item", command=add_item)
 add_item_button.grid(row=4, column=2, pady=5)
 
 
-
-
-
 columns = ('qty', 'desc', 'price', 'total')
 tree = ttk.Treeview(frame, columns=columns, show="headings")
 tree.heading('qty', text='Qty')
@@ -126,7 +125,7 @@ tree.heading('price', text='Unit Price')
 tree.heading('total', text="Total")
 tree.grid(row=5, column=0, columnspan=3, padx=20, pady=10)
 
-save_invoice_button = tkinter.Button(frame, text="Generate Invoice",command=generate_invoice)
+save_invoice_button = tkinter.Button(frame, text="Generate document",command=generate_invoice)
 save_invoice_button.grid(row=6, column=0, columnspan=3, sticky="news", padx=20, pady=5)
 new_invoice_button = tkinter.Button(frame, text="New Invoice", command=new_invoice)
 new_invoice_button.grid(row=7, column=0, columnspan=3, sticky="news", padx=20, pady=5)
