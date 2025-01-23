@@ -82,30 +82,49 @@ def generate_invoice():
 ctk.set_appearance_mode("dark")  # Options: "System" (default), "Light", "Dark"
 ctk.set_default_color_theme("blue")  # Options: "blue" (default), "green", "dark-blue"
 
+
+
 window = ctk.CTk()
 window.title("Invoice Generator Form")
-window.geometry("600x600")
+window.geometry("1000x800")
 
-frame = ctk.CTkFrame(window)
+# Create a tab view with two tabs
+tabview = ctk.CTkTabview(window, width=950, height=550)
+tabview.pack(padx=20, pady=20)
+
+# Add two tabs to the tabview
+tab_invoice_Gen = tabview.add("Invoice Generator")
+tab_company_name = tabview.add("Later Tab")
+
+frame = ctk.CTkFrame(tab_invoice_Gen)
 frame.pack(padx=20, pady=20)
 
 doc_type_option = ctk.IntVar()
 
-# Customer Information Frame
-customer_info_frame = ctk.CTkFrame(frame, corner_radius=10)
-customer_info_frame.grid(row=0, column=0, padx=10, pady=10)
+# Read company names from text file and create a list for the dropdown
+with open('CompanyName.txt', 'r') as company_file:
+    company_names = [line.strip() for line in company_file.readlines()]  # Strip newline characters
 
-ctk.CTkLabel(customer_info_frame, text="Customer Information").grid(row=0, column=0, columnspan=2, pady=5)
-ctk.CTkLabel(customer_info_frame, text="First Name:").grid(row=1, column=0)
-ctk.CTkLabel(customer_info_frame, text="Last Name:").grid(row=2, column=0)
-ctk.CTkLabel(customer_info_frame, text="Phone:").grid(row=3, column=0)
+# Customer Information Frame
+customer_info_frame = ctk.CTkFrame(frame, corner_radius=10 )
+customer_info_frame.grid(row=0, column=0, padx=12, pady=12)
+
+ctk.CTkLabel(customer_info_frame, text="Customer Information", font=("Arial", 16, "bold")).grid(row=0, column=0, columnspan=2, pady=10)
+ctk.CTkLabel(customer_info_frame, text="Company:").grid(row=1, column=0)
+ctk.CTkLabel(customer_info_frame, text="First Name:").grid(row=2, column=0)
+ctk.CTkLabel(customer_info_frame, text="Last Name:").grid(row=3, column=0)
+ctk.CTkLabel(customer_info_frame, text="Phone:").grid(row=4, column=0)
+
+# Create a dropdown (ComboBox) for company names
+company_name_entry = ctk.CTkComboBox(customer_info_frame, values=company_names)
+company_name_entry.grid(row=1, column=1, pady=5)
 
 first_name_entry = ctk.CTkEntry(customer_info_frame)
-first_name_entry.grid(row=1, column=1, pady=5)
+first_name_entry.grid(row=2, column=1, pady=5)
 last_name_entry = ctk.CTkEntry(customer_info_frame)
-last_name_entry.grid(row=2, column=1, pady=5)
+last_name_entry.grid(row=3, column=1, pady=5)
 phone_entry = ctk.CTkEntry(customer_info_frame)
-phone_entry.grid(row=3, column=1, pady=5)
+phone_entry.grid(row=4, column=1, pady=5)
 
 # Invoice/Quote selection
 invoiceOrQuote_frame = ctk.CTkFrame(frame, corner_radius=10)
