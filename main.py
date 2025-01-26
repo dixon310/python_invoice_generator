@@ -79,7 +79,7 @@ def generate_invoice():
         doc.save(doc_path)
 
         messagebox.showinfo(doc_type_selection + " Complete", doc_type_selection + " document generated successfully.")
-        new_invoice()
+        # new_invoice() # Clear the form after generating the document
 
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred while generating the document: {e}")
@@ -93,7 +93,7 @@ ctk.set_default_color_theme("blue")  # Options: "blue" (default), "green", "dark
 
 window = ctk.CTk()
 window.title("Invoice Generator Form")
-window.geometry("1000x800")
+window.minsize(800, 600)
 
 # Create a tab view with two tabs
 tabview = ctk.CTkTabview(window, width=950, height=550)
